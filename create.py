@@ -9,7 +9,7 @@ from oauth2client import file, client, tools
 
 ##following lines are to set up authentication to your google drive to access
 ##changed items log
-SCOPES = 'https://www.googleapis.com/auth/drive.readonly.metadata'
+SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 store = file.Storage('storage.json')
 creds = store.get()
 if not creds or creds.invalid:
