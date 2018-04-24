@@ -1,0 +1,6 @@
+# these files should be ignored from git tracking
+package.xml
+destructiveChanges.xml
+client_secret.json
+storage.json
+.DS_Store

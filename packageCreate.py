@@ -1,11 +1,8 @@
-## import xlwings library
-import xlwings as xw
-
 ##import dependencies for Google Drive API
-from __future__ import print_function
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import file, client, tools
+import gspread
 
 ##following lines are to set up authentication to your google drive to access
 ##changed items log
@@ -15,40 +12,31 @@ creds = store.get()
 if not creds or creds.invalid:
     flow = client.flow_from_clientsecrets('client_secret.json', SCOPES)
     creds = tools.run_flow(flow, store)
-    
-DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
-##files = DRIVE.files().list().execute().get('files', [])
 
 
-
-## instantiate a workbook object
-wb = xw.Book('CT Items Log.xlsx')
-## gather the worksheet name and data range that will be processed
-##data_sheet = input("Please enter the name of the worksheet that contains your data: ")
-data_sheet = 'S2W2 - 219'
-data_range = input("Please enter the data range you'd like to convert to a package.xml: ")
-
-##create sheet object with desired sheet
-sheet = wb.sheets(data_sheet)
-##gather data object based on data range specified in input
-data = sheet.range(data_range)
+client = gspread.authorize(creds)
 
 
+sheet = client.open("CoorsTek - Changed Items Log").sheet1
+
+data = sheet.get_all_values()
+
+#following code is to parse through data gathered from google drive
 constructive_items_dict = {}
 destructive_items_dict = {}
 #go through the data gathered and start creating dictionary of all data types specified and member items
-for item in data.value:
-    if item[4] == 'Constructive':
-        if item[2] in constructive_items_dict:
-            constructive_items_dict[item[2]].append(str(item[3]))
+for item in data:
+    if item[8] == 'Constructive':
+        if item[6] in constructive_items_dict:
+            constructive_items_dict[item[6]].append(str(item[7]))
         else:
-            constructive_items_dict[item[2]] = [str(item[3])]
+            constructive_items_dict[item[6]] = [str(item[7])]
 
-    elif item[4] == 'Destructive':
-        if item[2] in destructive_items_dict:
-            destructive_items_dict[item[2]].append(str(item[3]))
+    elif item[8] == 'Destructive':
+        if item[6] in destructive_items_dict:
+            destructive_items_dict[item[6]].append(str(item[7]))
         else:
-            destructive_items_dict[item[2]] = [str(item[3])]
+            destructive_items_dict[item[6]] = [str(item[7])]
 constructive_package = ''
 destructive_package = ''
 #go through dict created above and format each type based on requirements for package.xml file
@@ -91,6 +79,7 @@ file = open('destructiveChanges.xml', mode= 'w')
 file.write(destructive_package)
 
 file.close()
+
 
 
 
