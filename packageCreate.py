@@ -16,7 +16,6 @@ if not creds or creds.invalid:
 
 client = gspread.authorize(creds)
 
-
 sheet = client.open("CoorsTek - Changed Items Log").sheet1
 
 data = sheet.get_all_values()
@@ -24,6 +23,7 @@ data = sheet.get_all_values()
 #following code is to parse through data gathered from google drive
 constructive_items_dict = {}
 destructive_items_dict = {}
+
 #go through the data gathered and start creating dictionary of all data types specified and member items
 for item in data:
     if item[8] == 'Constructive':
